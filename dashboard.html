@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html class="dark" dir="rtl" lang="ar">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>لوحة التحكم وإدارة التكاليف ERP | منظومة محمود المتكاملة</title>
+
+  <!-- Google Fonts: Cairo & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          },
+          fontFamily: {
+            cairo: ["Cairo", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .table-sticky-col {
+      position: sticky;
+      right: 0;
+      z-index: 10;
+    }
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+    th.sortable:hover {
+      background-color: rgba(99, 102, 241, 0.08);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-[#0B0F19] font-cairo text-slate-800 dark:text-slate-100 antialiased min-h-screen">
+
+  <!-- Ambient Animated Background Orbs -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-purple-500/15 dark:bg-purple-600/15 rounded-full blur-3xl animate-orb"></div>
+    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-600/15 rounded-full blur-3xl animate-orb" style="animation-delay: 3s;"></div>
+  </div>
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside id="sidebar" class="fixed right-0 top-0 bottom-0 w-64 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl z-50 flex flex-col justify-between select-none shadow-2xl border-l border-slate-200/80 dark:border-slate-800/80 transition-all duration-300">
+    <div class="flex flex-col h-full overflow-hidden">
+      
+      <!-- Mahmoud Logo in Sidebar -->
+      <div class="h-20 flex items-center gap-3 px-5 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/50">
+        <a href="dashboard.html" class="brand-logo-container">
+          <div class="brand-badge !w-10 !h-10">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M4 19V7l8-4 8 4v12l-8 4-8-4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 3v8m-4 4l4-3 4 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="brand-title !text-lg truncate">محمود ERP</span>
+            <span class="brand-subtitle !text-[9px] truncate">ENTERPRISE SYSTEM</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1.5" id="sidebarNav">
+        <a href="#overview" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800/70 hover:text-indigo-600 dark:hover:text-white transition font-medium text-xs">
+          <span class="material-symbols-outlined text-[20px] text-indigo-500">dashboard</span>
+          <span>الرئيسية والملخص</span>
+        </a>
+
+        <a href="#cost-report" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs shadow-md shadow-indigo-500/20 transition">
+          <span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+          <span>تقرير تكلفة الشهر ERP</span>
+        </a>
+
+        <a href="#inwards" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800/70 hover:text-indigo-600 dark:hover:text-white transition font-medium text-xs">
+          <span class="material-symbols-outlined text-[20px] text-emerald-500">inventory</span>
+          <span>حركات الاستلام والوارد</span>
+        </a>
+
+        <a href="#disbursement" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800/70 hover:text-indigo-600 dark:hover:text-white transition font-medium text-xs">
+          <span class="material-symbols-outlined text-[20px] text-amber-500">output</span>
+          <span>أذونات الصرف</span>
+        </a>
+
+        <a href="#returns" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800/70 hover:text-indigo-600 dark:hover:text-white transition font-medium text-xs">
+          <span class="material-symbols-outlined text-[20px] text-rose-500">assignment_return</span>
+          <span>المرتجعات والتحويلات</span>
+        </a>
+
+        <a href="#physical-count" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800/70 hover:text-indigo-600 dark:hover:text-white transition font-medium text-xs">
+          <span class="material-symbols-outlined text-[20px] text-cyan-500">fact_check</span>
+          <span>مطابقة الجرد الفعلي</span>
+        </a>
+
+        <!-- Section: Other Connected Pages -->
+        <div class="pt-4 pb-1">
+          <div class="px-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            صفحات المصادقة والأمان
+          </div>
+        </div>
+
+        <a href="index.html" data-navigate class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-indigo-50/50 dark:hover:bg-slate-800/50 hover:text-indigo-600 transition text-xs font-semibold">
+          <span class="material-symbols-outlined text-[18px]">lock</span>
+          <span>صفحة تسجيل الدخول</span>
+        </a>
+
+        <a href="register.html" data-navigate class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-indigo-50/50 dark:hover:bg-slate-800/50 hover:text-indigo-600 transition text-xs font-semibold">
+          <span class="material-symbols-outlined text-[18px]">person_add</span>
+          <span>إنشاء حساب مسؤول</span>
+        </a>
+
+        <a href="otp.html" data-navigate class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-indigo-50/50 dark:hover:bg-slate-800/50 hover:text-indigo-600 transition text-xs font-semibold">
+          <span class="material-symbols-outlined text-[18px]">key</span>
+          <span>شاشة التحقق 2FA</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer: Settings & Logout -->
+      <div class="p-3 border-t border-slate-200/80 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/50 space-y-1">
+        <button id="btnOpenSettings" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition cursor-pointer">
+          <span class="material-symbols-outlined text-[18px] text-slate-400">settings</span>
+          <span>إعدادات منظومة محمود</span>
+        </button>
+
+        <button id="btnLogout" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-bold transition cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>تسجيل الخروج</span>
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN PAGE WRAPPER ==================== -->
+  <div class="pr-0 md:pr-64 transition-all min-h-screen flex flex-col justify-between">
+
+    <!-- Top Navigation Header -->
+    <header class="fixed top-0 right-0 md:right-64 left-0 h-16 glass-header z-40 flex items-center justify-between px-4 lg:px-8">
+      
+      <!-- Left: Mobile Toggle & Breadcrumb -->
+      <div class="flex items-center gap-3.5">
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <span class="material-symbols-outlined text-[22px]">menu</span>
+        </button>
+
+        <div class="flex items-center gap-2 text-xs">
+          <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[16px]">apartment</span>
+          </div>
+          <span class="font-bold text-slate-900 dark:text-white text-sm">منظومة محمود ERP</span>
+          <span class="text-slate-400">/</span>
+          <span class="text-slate-500 dark:text-slate-400 hidden sm:inline">تقرير تكلفة الشهر ومراقبة المخازن</span>
+        </div>
+
+        <div class="hidden xl:flex items-center gap-1.5 bg-indigo-50/70 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/50 px-3 py-1 rounded-full text-xs font-semibold">
+          <span class="material-symbols-outlined text-[15px]">calendar_today</span>
+          <span class="font-mono text-[11px]">2026-11 | السنة المالية الحالية</span>
+        </div>
+      </div>
+
+      <!-- Right: Search, Notifications, Theme & Mahmoud Profile -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Quick Search -->
+        <div class="relative hidden sm:block">
+          <input id="headerSearchInput" class="w-48 lg:w-64 py-1.5 pr-9 pl-3 rounded-xl glass-input text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition" placeholder="بحث باسم الصنف أو الكود..." type="text"/>
+          <span class="material-symbols-outlined absolute right-2.5 top-2 text-[17px] text-slate-400 pointer-events-none">search</span>
+        </div>
+
+        <!-- Notifications Bell -->
+        <button id="btnNotifications" class="relative p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-indigo-600 transition cursor-pointer" type="button" title="التنبيهات">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <span class="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+        </button>
+
+        <!-- Dark/Light Theme Switcher -->
+        <button aria-label="تبديل الوضع" class="theme-toggle-btn p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white/70 dark:bg-slate-800/80 text-slate-600 dark:text-yellow-400 hover:scale-105 transition cursor-pointer" type="button">
+          <span class="material-symbols-outlined text-[20px] sun-icon hidden">light_mode</span>
+          <span class="material-symbols-outlined text-[20px] moon-icon">dark_mode</span>
+        </button>
+
+        <!-- User Profile Pill: Mahmoud -->
+        <div class="flex items-center gap-2.5 pl-1 pr-2.5 py-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div class="flex flex-col text-right">
+            <span class="text-xs font-black text-slate-900 dark:text-white leading-tight">محمود</span>
+            <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold leading-tight">المدير العام (Admin)</span>
+          </div>
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center font-bold text-xs shadow-md">
+            <span>م</span>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="w-full pt-20 px-4 lg:px-8 py-6 relative z-10 flex-1 space-y-6">
+
+      <!-- ==================== HEADER ACTIONS & HERO ==================== -->
+      <section class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2.5">
+            <div class="w-2.5 h-8 bg-gradient-to-b from-indigo-600 to-pink-500 rounded-full"></div>
+            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">تقرير تكلفة الشهر ومراقبة المخزون</h1>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold border border-emerald-200 dark:border-emerald-800/60 font-mono">
+              <span class="material-symbols-outlined text-[13px]">verified</span>
+              معتمد مالياً
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 pr-5">
+            متابعة حركة المخزون الفعلي، أذونات الصرف، والمرتجع وتكلفة الشهر لفنادق ومنشآت محمود ERP
+          </p>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2 self-start lg:self-center">
+          <button id="btnOpenAddModal" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white shadow-md shadow-indigo-500/20 text-xs font-bold transition transform active:scale-95 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            <span>إضافة صنف / قيد</span>
+          </button>
+
+          <button id="btnPrintReport" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-bold transition shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[18px] text-indigo-500">print</span>
+            <span>طباعة التقرير</span>
+          </button>
+
+          <button id="btnExportExcel" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-bold transition shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">table_view</span>
+            <span>تصدير إلى Excel</span>
+          </button>
+
+          <button id="btnResetFilter" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 text-xs font-bold transition shadow-sm cursor-pointer">
+            <span class="material-symbols-outlined text-[18px] text-purple-500">sync</span>
+            <span>تحديث</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== FILTER BAR ("المربعات اللي فوق") ==================== -->
+      <section class="glass-card rounded-2xl p-5 shadow-lg space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200/60 dark:border-slate-800">
+          <div class="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
+            <span class="material-symbols-outlined text-indigo-600 text-[20px]">filter_alt</span>
+            <span>معايير التصفية والبحث الفوري</span>
+          </div>
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg font-mono">
+            الفترة الحالية: الربع الأخير 2026
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
+          <!-- 1. Hotel / Branch -->
+          <div class="space-y-1">
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300">الفندق / الفرع</label>
+            <div class="relative">
+              <select id="filterHotel" class="w-full h-9 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-xl px-2.5 pl-8 appearance-none border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 cursor-pointer">
+                <option value="all">جميع الفروع</option>
+                <option value="فندق جراند هايتس" selected>فندق جراند هايتس</option>
+                <option value="منتجع رويال بيتش">منتجع رويال بيتش</option>
+                <option value="أجنحة القصر التنفيذية">أجنحة القصر التنفيذية</option>
+              </select>
+              <span class="material-symbols-outlined absolute left-2 top-2 text-[18px] text-slate-400 pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- 2. Warehouse -->
+          <div class="space-y-1">
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300">المخزن</label>
+            <div class="relative">
+              <select id="filterWarehouse" class="w-full h-9 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-xl px-2.5 pl-8 appearance-none border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 cursor-pointer">
+                <option value="all">جميع المخازن</option>
+                <option value="المخزن الرئيسي" selected>المخزن الرئيسي</option>
+                <option value="مخزن F&B">مخزن F&B</option>
+                <option value="مستودع المشتريات الجافة">مستودع المشتريات الجافة</option>
+              </select>
+              <span class="material-symbols-outlined absolute left-2 top-2 text-[18px] text-slate-400 pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- 3. Department -->
+          <div class="space-y-1">
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300">القسم المستهلك</label>
+            <div class="relative">
+              <select id="filterDepartment" class="w-full h-9 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-xl px-2.5 pl-8 appearance-none border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 cursor-pointer">
+                <option value="all" selected>جميع الأقسام</option>
+                <option value="المطبخ الرئيسي">المطبخ الرئيسي</option>
+                <option value="قسم الحلواني">قسم الحلواني</option>
+                <option value="قسم المشروبات والبار">قسم المشروبات والبار</option>
+                <option value="الإشراف الداخلي">الإشراف الداخلي</option>
+              </select>
+              <span class="material-symbols-outlined absolute left-2 top-2 text-[18px] text-slate-400 pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- 4. Category -->
+          <div class="space-y-1">
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300">تصنيف الصنف</label>
+            <div class="relative">
+              <select id="filterCategory" class="w-full h-9 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-xl px-2.5 pl-8 appearance-none border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 cursor-pointer">
+                <option value="all" selected>جميع التصنيفات</option>
+                <option value="اللحوم والدواجن">اللحوم والدواجن</option>
+                <option value="الخضار والفواكه">الخضار والفواكه</option>
+                <option value="الألبان والبيض">الألبان والبيض</option>
+                <option value="البقالة الجافة">البقالة الجافة</option>
+                <option value="المشروبات والعصائر">المشروبات والعصائر</option>
+              </select>
+              <span class="material-symbols-outlined absolute left-2 top-2 text-[18px] text-slate-400 pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <!-- 5. Quick Filter Button -->
+          <div class="flex items-end">
+            <button id="btnApplyFilters" class="w-full h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">search</span>
+              <span>تطبيق التصفية</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== DYNAMIC KPI SUMMARY CARDS ==================== -->
+      <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5" id="kpiCardsContainer">
+        
+        <!-- Card 1: Opening Balance -->
+        <div class="glass-card rounded-2xl p-4 interactive-card space-y-1 border-t-4 border-t-indigo-500">
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">رصيد أول المدة</span>
+          <div class="text-lg font-black font-mono text-slate-900 dark:text-white" id="kpiTotalOpening">0</div>
+          <span class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold block">إجمالي بداية الفترة</span>
+        </div>
+
+        <!-- Card 2: Inwards -->
+        <div class="glass-card rounded-2xl p-4 interactive-card space-y-1 border-t-4 border-t-emerald-500">
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">إجمالي الوارد</span>
+          <div class="text-lg font-black font-mono text-emerald-600 dark:text-emerald-400" id="kpiTotalInwards">0</div>
+          <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold block">المشتريات المعتمدة</span>
+        </div>
+
+        <!-- Card 3: Returns & Transfers -->
+        <div class="glass-card rounded-2xl p-4 interactive-card space-y-1 border-t-4 border-t-amber-500">
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">مرتجع وتحويلات</span>
+          <div class="text-lg font-black font-mono text-amber-600 dark:text-amber-400" id="kpiTotalReturns">0</div>
+          <span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">الحركات المتبادلة</span>
+        </div>
+
+        <!-- Card 4: Disbursements -->
+        <div class="glass-card rounded-2xl p-4 interactive-card space-y-1 border-t-4 border-t-rose-500">
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">إجمالي المنصرف</span>
+          <div class="text-lg font-black font-mono text-rose-600 dark:text-rose-400" id="kpiTotalDisbursement">0</div>
+          <span class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold block">تكلفة التشغيل الفعلي</span>
+        </div>
+
+        <!-- Card 5: Actual Book Balance -->
+        <div class="glass-card rounded-2xl p-4 interactive-card space-y-1 border-t-4 border-t-blue-500">
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">الرصيد الدفتري</span>
+          <div class="text-lg font-black font-mono text-blue-600 dark:text-blue-400" id="kpiTotalActualBalance">0</div>
+          <span class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold block">الرصيد المحاسبي المتوقع</span>
+        </div>
+
+        <!-- Card 6: Physical Count & Variance -->
+        <div class="glass-card rounded-2xl p-4 interactive-card space-y-1 border-t-4 border-t-purple-500">
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">الجرد الفعلي والفارق</span>
+          <div class="text-lg font-black font-mono text-purple-600 dark:text-purple-400" id="kpiTotalPhysicalCount">0</div>
+          <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold block" id="kpiVarianceDisplay">فارق: 0.00 ج.م</span>
+        </div>
+
+      </section>
+
+      <!-- ==================== MAIN DATA TABLE ==================== -->
+      <section class="glass-card rounded-2xl shadow-xl overflow-hidden border border-slate-200/80 dark:border-slate-800">
+        
+        <!-- Table Top Header -->
+        <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/60 dark:border-slate-800 bg-white/40 dark:bg-slate-900/40">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-ping"></span>
+            <h3 class="text-sm font-black text-slate-900 dark:text-white">جدول القيود المحاسبية وحركة الأصناف</h3>
+            <span class="text-xs bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-mono font-bold px-2.5 py-0.5 rounded-full" id="recordCountBadge">10 أصناف</span>
+          </div>
+
+          <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+            <span>انقر على اسم العمود لترتيب البيانات تصاعدياً أو تنازلياً</span>
+          </div>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-right text-xs divide-y divide-slate-200/60 dark:divide-slate-800" id="inventoryTable">
+            <thead class="bg-slate-100/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold select-none whitespace-nowrap">
+              <tr>
+                <th class="p-3.5 sortable" data-col="id">#</th>
+                <th class="p-3.5 sortable" data-col="code">كود الصنف (SKU)</th>
+                <th class="p-3.5 sortable table-sticky-col bg-slate-100 dark:bg-slate-800 shadow-sm" data-col="name">اسم الصنف</th>
+                <th class="p-3.5 sortable" data-col="category">التصنيف</th>
+                <th class="p-3.5 sortable" data-col="unit">الوحدة</th>
+                <th class="p-3.5 sortable" data-col="hotel">الفرع</th>
+                <th class="p-3.5 sortable" data-col="warehouse">المخزن</th>
+                <th class="p-3.5 sortable font-mono" data-col="opening">أول المدة</th>
+                <th class="p-3.5 sortable font-mono text-emerald-600" data-col="inwards">الوارد</th>
+                <th class="p-3.5 sortable font-mono text-amber-600" data-col="returns">المرتجع</th>
+                <th class="p-3.5 sortable font-mono text-rose-600" data-col="disbursement">المنصرف</th>
+                <th class="p-3.5 sortable font-mono text-blue-600" data-col="actualBalance">الرصيد الدفتري</th>
+                <th class="p-3.5 sortable font-mono text-purple-600" data-col="physicalCount">الجرد الفعلي</th>
+                <th class="p-3.5 sortable font-mono" data-col="diff">الفارق</th>
+                <th class="p-3.5 text-center">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200/50 dark:divide-slate-800/60 text-slate-800 dark:text-slate-200 font-medium whitespace-nowrap" id="tableBody">
+              <!-- Dynamically Populated by script -->
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 w-full max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200/50 dark:border-slate-800/60 mt-8 gap-2">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-800 dark:text-slate-200">منظومة محمود المتكاملة (ERP)</span>
+        <span>— تقرير تكلفة الشهر والمخزون 2026</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a class="hover:text-indigo-500 transition" href="index.html" data-navigate>تسجيل الدخول</a>
+        <span>•</span>
+        <a class="hover:text-indigo-500 transition" href="register.html" data-navigate>إنشاء حساب</a>
+        <span>•</span>
+        <a class="hover:text-indigo-500 transition" href="otp.html" data-navigate>التحقق 2FA</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== MODAL: ADD NEW ITEM / ENTRY ==================== -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity" id="addItemModal">
+    <div class="glass-card w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl relative border border-white/20 dark:border-slate-700 animate-orb" style="animation-duration: 25s;">
+      
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200/60 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">add_business</span>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-slate-900 dark:text-white">إضافة قيد / صنف جديد للمخزون</h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">سجل بيانات الصنف بدقة لحساب التكلفة تلقائياً</p>
+          </div>
+        </div>
+        <button id="closeAddModal" class="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="addInventoryForm" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="space-y-1 sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">اسم الصنف</label>
+            <input id="newRowName" class="w-full py-2 px-3 rounded-xl glass-input text-xs" placeholder="مثال: لحم ضأن طازج" required type="text"/>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">كود الصنف (SKU)</label>
+            <input id="newRowCode" class="w-full py-2 px-3 rounded-xl glass-input text-xs font-mono" placeholder="SKU-MEAT-099" required type="text"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">الوحدة</label>
+            <input id="newRowUnit" class="w-full py-2 px-3 rounded-xl glass-input text-xs" placeholder="كجم / لتر / علبة" required type="text" value="كجم"/>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">التصنيف</label>
+            <select id="newRowCategory" class="w-full py-2 px-3 rounded-xl glass-input text-xs">
+              <option value="اللحوم والدواجن">اللحوم والدواجن</option>
+              <option value="الخضار والفواكه">الخضار والفواكه</option>
+              <option value="الألبان والبيض">الألبان والبيض</option>
+              <option value="البقالة الجافة">البقالة الجافة</option>
+              <option value="المشروبات والعصائر">المشروبات والعصائر</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">المخزن</label>
+            <select id="newRowWarehouse" class="w-full py-2 px-3 rounded-xl glass-input text-xs">
+              <option value="المخزن الرئيسي">المخزن الرئيسي</option>
+              <option value="مخزن F&B">مخزن F&B</option>
+              <option value="مستودع المشتريات الجافة">مستودع المشتريات الجافة</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold font-cairo text-slate-700 dark:text-slate-300">أول المدة (ج.م)</label>
+            <input id="newRowOpening" class="w-full py-2 px-3 rounded-xl glass-input text-xs" type="number" value="10000" required/>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold font-cairo text-slate-700 dark:text-slate-300">الوارد (ج.م)</label>
+            <input id="newRowInwards" class="w-full py-2 px-3 rounded-xl glass-input text-xs" type="number" value="25000" required/>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold font-cairo text-slate-700 dark:text-slate-300">المرتجع (ج.م)</label>
+            <input id="newRowReturns" class="w-full py-2 px-3 rounded-xl glass-input text-xs" type="number" value="500" required/>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold font-cairo text-slate-700 dark:text-slate-300">المنصرف (ج.م)</label>
+            <input id="newRowDisbursement" class="w-full py-2 px-3 rounded-xl glass-input text-xs" type="number" value="18000" required/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold font-cairo text-slate-700 dark:text-slate-300">الجرد الفعلي الفعلي (ج.م)</label>
+            <input id="newRowPhysical" class="w-full py-2 px-3 rounded-xl glass-input text-xs" type="number" value="16500" required/>
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold font-cairo text-slate-700 dark:text-slate-300">التكلفة اليدوية المعتمدة</label>
+            <input id="newRowManual" class="w-full py-2 px-3 rounded-xl glass-input text-xs" type="number" value="17200" required/>
+          </div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2.5">
+          <button id="cancelAddModal" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-white transition cursor-pointer" type="button">إلغاء</button>
+          <button class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs shadow-md shadow-indigo-500/25 transition cursor-pointer" type="submit">
+            حفظ القيد وإدراجه في التقرير
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: ITEM DETAILS ==================== -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity" id="detailsModal">
+    <div class="glass-card w-full max-w-lg rounded-3xl p-6 shadow-2xl relative border border-white/20 dark:border-slate-700" id="detailsModalContent">
+      <!-- Injected by script -->
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: MAHMOUD SETTINGS ==================== -->
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity" id="settingsModal">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 shadow-2xl relative border border-white/20 dark:border-slate-700">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="text-base font-black text-slate-900 dark:text-white">إعدادات منظومة محمود</h3>
+        <button id="closeSettingsModal" class="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer" type="button">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المسؤول</label>
+          <input id="settingUserName" class="w-full py-2 px-3 rounded-xl glass-input text-xs" value="محمود" type="text"/>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">البريد الإلكتروني للإشعارات</label>
+          <input id="settingUserEmail" class="w-full py-2 px-3 rounded-xl glass-input text-xs font-mono" value="mahmoud@enterprise.com" type="email"/>
+        </div>
+        <div class="flex items-center justify-between pt-2">
+          <span class="font-bold text-slate-700 dark:text-slate-300">التنبيه عند وجود فروقات في الجرد</span>
+          <input checked type="checkbox" class="w-4 h-4 text-indigo-600 rounded"/>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-700 dark:text-slate-300">المزامنة السحابية اللحظية</span>
+          <input checked type="checkbox" class="w-4 h-4 text-indigo-600 rounded"/>
+        </div>
+      </div>
+
+      <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+        <button id="saveSettingsBtn" class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow cursor-pointer">حفظ التغييرات</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // --- Comprehensive Inventory Data & Calculation Engine ---
+    let inventoryData = [
+      { id: 1, name: "لحوم بقري طازجة", code: "SKU-MEAT-001", unit: "كجم", hotel: "فندق جراند هايتس", warehouse: "المخزن الرئيسي", department: "المطبخ الرئيسي", category: "اللحوم والدواجن", opening: 35000, inwards: 85000, returns: 2500, transfers: 5000, disbursement: 60000, physicalCount: 58000, costManual: 54500 },
+      { id: 2, name: "دواجن ومصنعاتها", code: "SKU-POUL-002", unit: "كجم", hotel: "فندق جراند هايتس", warehouse: "المخزن الرئيسي", department: "المطبخ الرئيسي", category: "اللحوم والدواجن", opening: 22000, inwards: 65000, returns: 1800, transfers: 3200, disbursement: 45000, physicalCount: 40000, costManual: 41800 },
+      { id: 3, name: "خضروات طازجة متنوعة", code: "SKU-VEG-003", unit: "كجم", hotel: "فندق جراند هايتس", warehouse: "المخزن الرئيسي", department: "المطبخ الرئيسي", category: "الخضار والفواكه", opening: 14000, inwards: 48000, returns: 1200, transfers: 2100, disbursement: 38000, physicalCount: 21500, costManual: 37200 },
+      { id: 4, name: "فواكه استوائية وموسمية", code: "SKU-FRU-004", unit: "كجم", hotel: "فندق جراند هايتس", warehouse: "المخزن الرئيسي", department: "قسم الحلواني", category: "الخضار والفواكه", opening: 18000, inwards: 42000, returns: 950, transfers: 1500, disbursement: 32000, physicalCount: 25000, costManual: 32550 },
+      { id: 5, name: "ألبان ومنتجات أجبان", code: "SKU-DAI-005", unit: "لتر/كجم", hotel: "فندق جراند هايتس", warehouse: "المخزن الرئيسي", department: "المطبخ الرئيسي", category: "الألبان والبيض", opening: 20000, inwards: 52000, returns: 1100, transfers: 2800, disbursement: 39000, physicalCount: 31000, costManual: 38400 },
+      { id: 6, name: "أرز بسمتي ومكرونة فاخرة", code: "SKU-DRY-006", unit: "كجم", hotel: "فندق جراند هايتس", warehouse: "مستودع المشتريات الجافة", department: "المطبخ الرئيسي", category: "البقالة الجافة", opening: 45000, inwards: 90000, returns: 0, transfers: 4000, disbursement: 55000, physicalCount: 76000, costManual: 55000 },
+      { id: 7, name: "زيوت نباتية وسمن طبيعي", code: "SKU-OIL-007", unit: "لتر", hotel: "فندق جراند هايتس", warehouse: "مستودع المشتريات الجافة", department: "المطبخ الرئيسي", category: "البقالة الجافة", opening: 28000, inwards: 62000, returns: 500, transfers: 1200, disbursement: 44000, physicalCount: 44300, costManual: 44700 },
+      { id: 8, name: "عصائر طبيعية ومشروبات", code: "SKU-BEV-008", unit: "لتر", hotel: "منتجع رويال بيتش", warehouse: "مخزن F&B", department: "قسم المشروبات والبار", category: "المشروبات والعصائر", opening: 12000, inwards: 36000, returns: 400, transfers: 800, disbursement: 29000, physicalCount: 17800, costManual: 29400 },
+      { id: 9, name: "بن تركي وإسبريسو فاخر", code: "SKU-COF-009", unit: "كجم", hotel: "أجنحة القصر التنفيذية", warehouse: "مخزن F&B", department: "قسم المشروبات والبار", category: "المشروبات والعصائر", opening: 9500, inwards: 28000, returns: 200, transfers: 600, disbursement: 21000, physicalCount: 15700, costManual: 21200 },
+      { id: 10, name: "شوكولاتة وخامات حلويات", code: "SKU-SWT-010", unit: "كجم", hotel: "فندق جراند هايتس", warehouse: "المخزن الرئيسي", department: "قسم الحلواني", category: "البقالة الجافة", opening: 16000, inwards: 38000, returns: 300, transfers: 900, disbursement: 27000, physicalCount: 25800, costManual: 27300 }
+    ];
+
+    let sortColumn = 'id';
+    let sortDirection = 'asc';
+
+    // Calculation helper for each row
+    function calculateRow(item) {
+      // actualBalance = Opening + Inwards - Returns - Disbursement
+      const actualBalance = (item.opening + item.inwards) - (item.returns + item.disbursement);
+      const diff = item.physicalCount - actualBalance;
+      return { actualBalance, diff };
+    }
+
+    // Render Table & KPI Summary
+    function renderInventory() {
+      const hotelFilter = document.getElementById('filterHotel').value;
+      const warehouseFilter = document.getElementById('filterWarehouse').value;
+      const departmentFilter = document.getElementById('filterDepartment').value;
+      const categoryFilter = document.getElementById('filterCategory').value;
+      const searchTerm = document.getElementById('headerSearchInput').value.trim().toLowerCase();
+
+      // Filter rows
+      let filtered = inventoryData.filter(item => {
+        if (hotelFilter !== 'all' && item.hotel !== hotelFilter) return false;
+        if (warehouseFilter !== 'all' && item.warehouse !== warehouseFilter) return false;
+        if (departmentFilter !== 'all' && item.department !== departmentFilter) return false;
+        if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
+        if (searchTerm) {
+          const matchName = item.name.toLowerCase().includes(searchTerm);
+          const matchCode = item.code.toLowerCase().includes(searchTerm);
+          if (!matchName && !matchCode) return false;
+        }
+        return true;
+      });
+
+      // Sort rows
+      filtered.sort((a, b) => {
+        let valA = a[sortColumn];
+        let valB = b[sortColumn];
+        if (sortColumn === 'actualBalance') {
+          valA = calculateRow(a).actualBalance;
+          valB = calculateRow(b).actualBalance;
+        } else if (sortColumn === 'diff') {
+          valA = calculateRow(a).diff;
+          valB = calculateRow(b).diff;
+        }
+
+        if (typeof valA === 'string') {
+          return sortDirection === 'asc' ? valA.localeCompare(valB, 'ar') : valB.localeCompare(valA, 'ar');
+        }
+        return sortDirection === 'asc' ? valA - valB : valB - valA;
+      });
+
+      // Calculate KPI aggregates
+      let totalOpening = 0;
+      let totalInwards = 0;
+      let totalReturns = 0;
+      let totalDisbursement = 0;
+      let totalActualBalance = 0;
+      let totalPhysicalCount = 0;
+
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="15" class="text-center py-8 text-slate-400 font-semibold">لا توجد أصناف مطابقة للمعايير المحددة</td></tr>`;
+      }
+
+      filtered.forEach((item, index) => {
+        const { actualBalance, diff } = calculateRow(item);
+
+        totalOpening += item.opening;
+        totalInwards += item.inwards;
+        totalReturns += item.returns;
+        totalDisbursement += item.disbursement;
+        totalActualBalance += actualBalance;
+        totalPhysicalCount += item.physicalCount;
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-indigo-50/40 dark:hover:bg-slate-800/40 transition-colors';
+
+        // Diff badge style
+        let diffBadge = '';
+        if (diff === 0) {
+          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 font-bold font-mono">0.00</span>`;
+        } else if (diff > 0) {
+          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold font-mono">+${diff.toLocaleString()} (زيادة)</span>`;
+        } else {
+          diffBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 font-bold font-mono">${diff.toLocaleString()} (عجز)</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="p-3.5 font-mono text-slate-400">${item.id}</td>
+          <td class="p-3.5 font-mono font-bold text-indigo-600 dark:text-indigo-400">${item.code}</td>
+          <td class="p-3.5 font-bold text-slate-900 dark:text-white table-sticky-col bg-white dark:bg-slate-900 shadow-sm">${item.name}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-300">${item.category}</span></td>
+          <td class="p-3.5 text-slate-500">${item.unit}</td>
+          <td class="p-3.5 text-slate-600 dark:text-slate-300">${item.hotel}</td>
+          <td class="p-3.5 text-slate-500">${item.warehouse}</td>
+          <td class="p-3.5 font-mono">${item.opening.toLocaleString()}</td>
+          <td class="p-3.5 font-mono text-emerald-600 font-bold">+${item.inwards.toLocaleString()}</td>
+          <td class="p-3.5 font-mono text-amber-600">-${item.returns.toLocaleString()}</td>
+          <td class="p-3.5 font-mono text-rose-600 font-bold">-${item.disbursement.toLocaleString()}</td>
+          <td class="p-3.5 font-mono text-blue-600 font-bold">${actualBalance.toLocaleString()}</td>
+          <td class="p-3.5 font-mono text-purple-600 font-bold">${item.physicalCount.toLocaleString()}</td>
+          <td class="p-3.5">${diffBadge}</td>
+          <td class="p-3.5 text-center">
+            <div class="inline-flex items-center gap-1.5">
+              <button onclick="viewItemDetails(${item.id})" class="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition cursor-pointer" title="عرض تفاصيل الصنف">
+                <span class="material-symbols-outlined text-[17px]">visibility</span>
+              </button>
+              <button onclick="deleteItemRow(${item.id})" class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition cursor-pointer" title="حذف القيد">
+                <span class="material-symbols-outlined text-[17px]">delete</span>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Update KPI totals
+      document.getElementById('kpiTotalOpening').textContent = totalOpening.toLocaleString() + ' ج.م';
+      document.getElementById('kpiTotalInwards').textContent = totalInwards.toLocaleString() + ' ج.م';
+      document.getElementById('kpiTotalReturns').textContent = totalReturns.toLocaleString() + ' ج.م';
+      document.getElementById('kpiTotalDisbursement').textContent = totalDisbursement.toLocaleString() + ' ج.م';
+      document.getElementById('kpiTotalActualBalance').textContent = totalActualBalance.toLocaleString() + ' ج.م';
+      document.getElementById('kpiTotalPhysicalCount').textContent = totalPhysicalCount.toLocaleString() + ' ج.م';
+
+      const totalDiff = totalPhysicalCount - totalActualBalance;
+      const varianceEl = document.getElementById('kpiVarianceDisplay');
+      if (totalDiff === 0) {
+        varianceEl.textContent = 'مطابقة تامة للجرد ✓';
+        varianceEl.className = 'text-[10px] text-emerald-600 font-bold block';
+      } else if (totalDiff > 0) {
+        varianceEl.textContent = `فائض إجمالي: +${totalDiff.toLocaleString()} ج.م`;
+        varianceEl.className = 'text-[10px] text-emerald-600 font-bold block';
+      } else {
+        varianceEl.textContent = `عجز إجمالي: ${totalDiff.toLocaleString()} ج.م`;
+        varianceEl.className = 'text-[10px] text-rose-500 font-bold block';
+      }
+
+      document.getElementById('recordCountBadge').textContent = `${filtered.length} صنف مسجل`;
+    }
+
+    // Sorting headers handler
+    document.querySelectorAll('th.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortColumn === col) {
+          sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortColumn = col;
+          sortDirection = 'asc';
+        }
+        renderInventory();
+      });
+    });
+
+    // View Item Details Modal
+    window.viewItemDetails = function(id) {
+      const item = inventoryData.find(i => i.id === id);
+      if (!item) return;
+      const { actualBalance, diff } = calculateRow(item);
+      const modal = document.getElementById('detailsModal');
+      const container = document.getElementById('detailsModalContent');
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-bold">
+              <span class="material-symbols-outlined text-[18px]">info</span>
+            </div>
+            <h4 class="font-black text-slate-900 dark:text-white text-sm">تفاصيل القيد: ${item.name}</h4>
+          </div>
+          <button onclick="document.getElementById('detailsModal').classList.add('hidden')" class="p-1 rounded-full text-slate-400 hover:text-slate-600 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        </div>
+        <div class="space-y-3 text-xs">
+          <div class="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+            <div><span class="text-slate-400 block">كود الصنف:</span><span class="font-bold font-mono">${item.code}</span></div>
+            <div><span class="text-slate-400 block">الوحدة:</span><span class="font-bold">${item.unit}</span></div>
+            <div><span class="text-slate-400 block">الفندق:</span><span class="font-bold">${item.hotel}</span></div>
+            <div><span class="text-slate-400 block">المخزن:</span><span class="font-bold">${item.warehouse}</span></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 font-mono text-center">
+            <div class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50">
+              <span class="text-[10px] text-emerald-700 dark:text-emerald-300 font-cairo block">الوارد</span>
+              <span class="font-bold text-emerald-600">${item.inwards.toLocaleString()}</span>
+            </div>
+            <div class="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50">
+              <span class="text-[10px] text-rose-700 dark:text-rose-300 font-cairo block">المنصرف</span>
+              <span class="font-bold text-rose-600">${item.disbursement.toLocaleString()}</span>
+            </div>
+            <div class="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/50">
+              <span class="text-[10px] text-purple-700 dark:text-purple-300 font-cairo block">الجرد الفعلي</span>
+              <span class="font-bold text-purple-600">${item.physicalCount.toLocaleString()}</span>
+            </div>
+          </div>
+          <div class="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 flex items-center justify-between">
+            <span class="font-bold text-indigo-900 dark:text-indigo-200">الرصيد الدفتري المحسوب:</span>
+            <span class="font-bold font-mono text-indigo-600 text-sm">${actualBalance.toLocaleString()} ج.م</span>
+          </div>
+        </div>
+        <div class="pt-4 mt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+          <button onclick="document.getElementById('detailsModal').classList.add('hidden')" class="px-4 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs cursor-pointer">إغلاق</button>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    };
+
+    // Delete row action
+    window.deleteItemRow = function(id) {
+      if (confirm('هل أنت متأكد من حذف هذا القيد من تقرير تكلفة الشهر؟')) {
+        inventoryData = inventoryData.filter(i => i.id !== id);
+        renderInventory();
+        MahmoudApp.showToast('تم حذف القيد وتحديث التكاليف بنجاح', 'info');
+      }
+    };
+
+    // Excel CSV Export Engine with UTF-8 BOM for Arabic support
+    function exportToExcel() {
+      let csvContent = '\uFEFF'; // Arabic UTF-8 BOM
+      csvContent += 'كود الصنف,اسم الصنف,التصنيف,الوحدة,الفرع,المخزن,رصيد أول المدة,الوارد,المرتجع,المنصرف,الرصيد الدفتري,الجرد الفعلي,الفارق\r\n';
+
+      inventoryData.forEach(item => {
+        const { actualBalance, diff } = calculateRow(item);
+        csvContent += `"${item.code}","${item.name}","${item.category}","${item.unit}","${item.hotel}","${item.warehouse}",${item.opening},${item.inwards},${item.returns},${item.disbursement},${actualBalance},${item.physicalCount},${diff}\r\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `تقرير_تكلفة_الشهر_محمود_ERP_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      MahmoudApp.showToast('تم تصدير ملف Excel بنجاح ✓', 'success');
+    }
+
+    // Initial load & listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      renderInventory();
+
+      // Filter events
+      ['filterHotel', 'filterWarehouse', 'filterDepartment', 'filterCategory'].forEach(id => {
+        document.getElementById(id).addEventListener('change', renderInventory);
+      });
+      document.getElementById('headerSearchInput').addEventListener('input', renderInventory);
+      document.getElementById('btnApplyFilters').addEventListener('click', () => {
+        renderInventory();
+        MahmoudApp.showToast('تم تحديث معايير التصفية', 'info');
+      });
+
+      // Reset filters button
+      document.getElementById('btnResetFilter').addEventListener('click', () => {
+        document.getElementById('filterHotel').value = 'all';
+        document.getElementById('filterWarehouse').value = 'all';
+        document.getElementById('filterDepartment').value = 'all';
+        document.getElementById('filterCategory').value = 'all';
+        document.getElementById('headerSearchInput').value = '';
+        renderInventory();
+        MahmoudApp.showToast('تم إعادة تعيين وتحديث البيانات', 'success');
+      });
+
+      // Print report
+      document.getElementById('btnPrintReport').addEventListener('click', () => {
+        window.print();
+      });
+
+      // Excel export
+      document.getElementById('btnExportExcel').addEventListener('click', exportToExcel);
+
+      // Add Modal
+      const addModal = document.getElementById('addItemModal');
+      document.getElementById('btnOpenAddModal').addEventListener('click', () => {
+        addModal.classList.remove('hidden');
+      });
+      document.getElementById('closeAddModal').addEventListener('click', () => {
+        addModal.classList.add('hidden');
+      });
+      document.getElementById('cancelAddModal').addEventListener('click', () => {
+        addModal.classList.add('hidden');
+      });
+
+      // Submit Add Form
+      document.getElementById('addInventoryForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newRecord = {
+          id: inventoryData.length > 0 ? Math.max(...inventoryData.map(i => i.id)) + 1 : 1,
+          name: document.getElementById('newRowName').value.trim(),
+          code: document.getElementById('newRowCode').value.trim(),
+          unit: document.getElementById('newRowUnit').value.trim(),
+          hotel: document.getElementById('filterHotel').value !== 'all' ? document.getElementById('filterHotel').value : 'فندق جراند هايتس',
+          warehouse: document.getElementById('newRowWarehouse').value,
+          department: "المطبخ الرئيسي",
+          category: document.getElementById('newRowCategory').value,
+          opening: parseFloat(document.getElementById('newRowOpening').value) || 0,
+          inwards: parseFloat(document.getElementById('newRowInwards').value) || 0,
+          returns: parseFloat(document.getElementById('newRowReturns').value) || 0,
+          transfers: 0,
+          disbursement: parseFloat(document.getElementById('newRowDisbursement').value) || 0,
+          physicalCount: parseFloat(document.getElementById('newRowPhysical').value) || 0,
+          costManual: parseFloat(document.getElementById('newRowManual').value) || 0
+        };
+
+        inventoryData.unshift(newRecord);
+        addModal.classList.add('hidden');
+        document.getElementById('addInventoryForm').reset();
+        renderInventory();
+        MahmoudApp.showToast(`تم إدراج الصنف "${newRecord.name}" بنجاح في المنظومة 🎉`, 'success');
+      });
+
+      // Settings Modal
+      const settingsModal = document.getElementById('settingsModal');
+      document.getElementById('btnOpenSettings').addEventListener('click', () => {
+        settingsModal.classList.remove('hidden');
+      });
+      document.getElementById('closeSettingsModal').addEventListener('click', () => {
+        settingsModal.classList.add('hidden');
+      });
+      document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        const newName = document.getElementById('settingUserName').value.trim();
+        const newEmail = document.getElementById('settingUserEmail').value.trim();
+        MahmoudApp.setUser(newName, newEmail);
+        settingsModal.classList.add('hidden');
+        MahmoudApp.showToast('تم حفظ إعدادات منظومة محمود بنجاح', 'success');
+      });
+
+      // Notifications Bell
+      document.getElementById('btnNotifications').addEventListener('click', () => {
+        MahmoudApp.showToast('لديك 3 تنبيهات معتمدة: مطابقة جرد F&B جاهزة، ومراجعة أذونات الصرف تمت.', 'info');
+      });
+
+      // Logout Button -> Silky smooth navigation back to index.html
+      document.getElementById('btnLogout').addEventListener('click', () => {
+        if (confirm('هل ترغب في تسجيل الخروج الآمن والعودة لشاشة الدخول؟')) {
+          MahmoudApp.logout();
+        }
+      });
+
+      // Mobile Menu Toggle
+      const mobileBtn = document.getElementById('mobileMenuBtn');
+      const sidebar = document.getElementById('sidebar');
+      if (mobileBtn && sidebar) {
+        mobileBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('translate-x-full');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
